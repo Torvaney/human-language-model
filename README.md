@@ -2,7 +2,7 @@
 
 Test your language model!
 
-![](screenshot.png)
+[![](screenshot.png)](https://torvaney.github.io/projects/human-language-model.html)
 
 ## How to run
 
