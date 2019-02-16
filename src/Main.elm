@@ -238,7 +238,7 @@ showObservation obs =
 
 showCurrent obs =
     Maybe.map showWindow obs |>
-        Maybe.withDefault "(No examples left! Upload a file to try more!)"
+        Maybe.withDefault "(No examples left! Upload a .txt file to try more!)"
 
 
 showPrevious obs =
