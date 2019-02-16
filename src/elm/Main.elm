@@ -30,6 +30,7 @@ main =
 init : () -> ( Model, Cmd msg )
 init _ =
     ( { current   = Nothing
+      , previous  = Nothing
       , upcoming  = []
       , results   = []
       , windowLen = 10
@@ -42,6 +43,7 @@ init _ =
 
 type alias Model =
     { current   : Maybe Observation
+    , previous  : Maybe Observation
     , upcoming  : List Observation
     , results   : List Bool
     , windowLen : Int
@@ -81,7 +83,8 @@ update msg model =
         case model.current of
             Just obs ->
                 ( { model
-                  | results = (c == obs.nextLetter) :: model.results
+                  | results  = (c == obs.nextLetter) :: model.results
+                  , previous = model.current
                   } |> loadFromUpcoming
                 , Cmd.none
                 )
@@ -107,6 +110,7 @@ update msg model =
         in
             ( { model
               | results  = []
+              , previous = Nothing
               }
             , Random.generate Shuffle (Random.List.shuffle upcoming)
             )
@@ -140,7 +144,7 @@ loadUpcoming n content =
 view model =
     El.layout [ ] <|
         El.column
-            [ El.centerX ]
+            [ El.centerX, El.centerY ]
             [ El.el
                 [ El.centerX
                 , El.padding 10
@@ -148,22 +152,79 @@ view model =
                 , Font.bold
                 ]
                 (El.text "Test your language model")
-            , El.column
-                [ El.centerX, El.padding 10, El.spacing 5 ]
-                [ El.text <| showWindow model.current
-                , El.text <| (++) "Accuracy: " <| showAccuracy <| model.results
-                , Input.button
-                    []
+            , El.el
+                [ El.centerX
+                , El.padding 10
+                ]
+                (El.text "Which character comes next?")
+            , El.el
+                [ El.centerX
+                , El.padding 30
+                , Font.size 18
+                , Font.family
+                    [ Font.monospace
+                    ]
+                ]
+                (El.text <| showCurrent model.current)
+            , El.el
+                [ El.centerX
+                , El.padding 10
+                ]
+                (El.text <| (++) "Accuracy: " <| showAccuracy <| model.results)
+            , El.el
+                [ El.centerX
+                , El.padding 20
+                ]
+                ( Input.button
+                    [ Background.color (El.rgb255 240 240 240)
+                    , Border.color (El.rgb255 220 220 220)
+                    , Border.rounded 20
+                    , Border.width 2
+                    , El.padding 10
+                    ]
                     { onPress = Just TextRequested
                     , label   = El.text "Upload"
                     }
+                )
+            , El.el
+                [ El.centerX
+                , El.padding 10
                 ]
+                (El.text "Previous:")
+            , El.el
+                [ El.centerX
+                , El.padding 30
+                , Font.color (El.rgb255 120 120 120)
+                , Font.size 18
+                , Font.family
+                    [ Font.monospace
+                    ]
+                ]
+                (El.text <| showPrevious model.previous)
             ]
 
 
 showWindow obs =
-    Maybe.map (\x -> x.window) obs |>
-        Maybe.withDefault "(Nothing to show!)"
+    "\"..." ++ obs.window ++ "\""
+
+
+showObservation obs =
+    String.join ""
+        [ (showWindow obs)
+        , " + \""
+        , (String.fromChar obs.nextLetter)
+        , "\""
+        ]
+
+
+showCurrent obs =
+    Maybe.map showWindow obs |>
+        Maybe.withDefault "(No examples left! Upload a file to try more!)"
+
+
+showPrevious obs =
+    Maybe.map showObservation obs |>
+        Maybe.withDefault "(No previous attempts to show)"
 
 
 boolToInt : Bool -> Int
