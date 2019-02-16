@@ -141,25 +141,33 @@ loadUpcoming n content =
 
 -- VIEW
 
+defaultPadding =
+    { top    = 10
+    , right  = 10
+    , bottom = 10
+    , left   = 10
+    }
+
+
 view model =
     El.layout [ ] <|
         El.column
             [ El.centerX, El.centerY ]
             [ El.el
                 [ El.centerX
-                , El.padding 10
+                , El.paddingEach defaultPadding
                 , Font.size 24
                 , Font.bold
                 ]
                 (El.text "Test your language model")
             , El.el
                 [ El.centerX
-                , El.padding 10
+                , El.paddingEach defaultPadding
                 ]
                 (El.text "Which character comes next?")
             , El.el
                 [ El.centerX
-                , El.padding 30
+                , El.paddingEach { defaultPadding | top = 20 }
                 , Font.size 18
                 , Font.family
                     [ Font.monospace
@@ -168,12 +176,22 @@ view model =
                 (El.text <| showCurrent model.current)
             , El.el
                 [ El.centerX
-                , El.padding 10
+                , El.paddingEach { defaultPadding | bottom = 20 }
+                , Font.color (El.rgb255 140 140 140)
+                , Font.size 18
+                , Font.family
+                    [ Font.monospace
+                    ]
+                ]
+                (El.text <| showPrevious model.previous)
+            , El.el
+                [ El.centerX
+                , El.paddingEach defaultPadding
                 ]
                 (El.text <| (++) "Accuracy: " <| showAccuracy <| model.results)
             , El.el
                 [ El.centerX
-                , El.padding 20
+                , El.paddingEach { defaultPadding | top = 20 }
                 ]
                 ( Input.button
                     [ Background.color (El.rgb255 240 240 240)
@@ -186,21 +204,6 @@ view model =
                     , label   = El.text "Upload"
                     }
                 )
-            , El.el
-                [ El.centerX
-                , El.padding 10
-                ]
-                (El.text "Previous:")
-            , El.el
-                [ El.centerX
-                , El.padding 30
-                , Font.color (El.rgb255 120 120 120)
-                , Font.size 18
-                , Font.family
-                    [ Font.monospace
-                    ]
-                ]
-                (El.text <| showPrevious model.previous)
             ]
 
 
