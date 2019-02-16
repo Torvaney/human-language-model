@@ -2,6 +2,8 @@
 
 Test your language model!
 
+![](screenshot.png)
+
 ## How to run
 
 <!-- TODO: Automate with Make or something -->
