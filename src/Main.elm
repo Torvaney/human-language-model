@@ -204,6 +204,22 @@ view model =
                     , label   = El.text "Upload"
                     }
                 )
+            , El.el
+                [ El.centerX
+                , El.paddingEach { defaultPadding | top = 20, bottom = 20 }
+                , Font.color (El.rgb255 220 220 220)
+                ]
+                (El.text "---------")
+            , El.newTabLink
+                [ El.centerX
+                , Border.color (El.rgb255 220 220 220)
+                , Border.rounded 20
+                , Border.width 2
+                , El.padding 10
+                ]
+                { url = "https://github.com/Torvaney/human-language-model"
+                , label = El.text "view source"
+                }
             ]
 
 
