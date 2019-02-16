@@ -134,7 +134,7 @@ loadUpcoming : Int -> String -> List Observation
 loadUpcoming n content =
     content |>
         String.replace "\n" " " |>
-        String.Extra.break n |>
+        String.Extra.break (n + 1) |>
         List.filter (\s -> (String.length s) == n) |>
         List.filterMap stringToObservation
 
