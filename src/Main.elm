@@ -34,6 +34,7 @@ init _ =
       , upcoming  = []
       , results   = []
       , windowLen = 10
+      , content   = ""
       }
     , Cmd.none
     )
@@ -47,6 +48,7 @@ type alias Model =
     , upcoming  : List Observation
     , results   : List Bool
     , windowLen : Int
+    , content   : String
     }
 
 
@@ -106,11 +108,12 @@ update msg model =
 
     TextLoaded content ->
         let
-            upcoming = loadUpcoming model.windowLen content
+            upcoming = parseUploadedContent model.windowLen content
         in
             ( { model
               | results  = []
               , previous = Nothing
+              , content  = content
               }
             , Random.generate Shuffle (Random.List.shuffle upcoming)
             )
@@ -129,14 +132,25 @@ stringToObservation s =
         Maybe.map (\(n, w) -> Observation (String.reverse w) n)
 
 
--- TODO: better name
-loadUpcoming : Int -> String -> List Observation
-loadUpcoming n content =
+-- Parse an uploaded file into a bunch of "observations"
+-- Treat empty lines as content separators, and linebreaks as spaces
+parseUploadedContent : Int -> String -> List Observation
+parseUploadedContent windowLen content =
     content |>
-        String.replace "\n" " " |>
-        String.Extra.break (n + 1) |>
-        List.filter (\s -> (String.length s) == n) |>
-        List.filterMap stringToObservation
+        String.split "\n\n" |>
+        List.concatMap (parseCorpus windowLen)
+
+
+parseCorpus : Int -> String -> List Observation
+parseCorpus windowLen content =
+    let
+        observationLen = windowLen + 1
+    in
+        content |>
+            String.replace "\n" " " |>
+            String.Extra.break observationLen |>
+            List.filter (\s -> (String.length s) == observationLen) |>
+            List.filterMap stringToObservation
 
 
 -- VIEW
